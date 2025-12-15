@@ -525,5 +525,32 @@
         console.log('- mainApp:', document.getElementById('mainApp'));
     });
 </script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+<script>
+  // 🔥 THAY THẾ BẰNG CẤU HÌNH CỦA BẠN (từ Bước 2)
+  const firebaseConfig = {
+    apiKey: "AIzaSyA1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q",
+    authDomain: "expensemanager-pro.firebaseapp.com",
+    projectId: "expensemanager-pro",
+    storageBucket: "expensemanager-pro.appspot.com",
+    messagingSenderId: "123456789012",
+    appId: "1:123456789012:web:abcdef1234567890"
+  };
+  
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  
+  // Make available globally
+  window.firebaseAuth = firebase.auth();
+  window.firebaseFirestore = firebase.firestore();
+  window.firebaseStorage = firebase.storage();
+</script>
+
 </body>
+
 </html>
