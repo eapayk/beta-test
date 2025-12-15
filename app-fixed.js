@@ -87,6 +87,27 @@ function formatDate(dateString) {
     return date.toLocaleDateString('vi-VN');
 }
 
+function loadUserData() {
+    if (currentUser) {
+        monthlyLimit = currentUser.monthlyLimit || 0;
+        updateSummary();
+    }
+}
+
+function loadExpenses() {
+    if (currentUser) {
+        expenses = currentUser.expenses || [];
+        renderExpensesTable();
+    }
+}
+
+function loadCategories() {
+    if (currentUser) {
+        categories = currentUser.categories || [];
+        renderCategories();
+    }
+}
+
 // ========== THEME FUNCTIONS ==========
 function loadTheme() {
     currentTheme = JSON.parse(localStorage.getItem('expenseManagerTheme') || '{}');
@@ -454,10 +475,10 @@ function showAuthForm() {
 function showMainApp() {
     document.getElementById('authContainer').style.display = 'none';
     document.getElementById('mainApp').style.display = 'block';
-    document.getElementById('userMenu').style.display = 'flex';
+    document.getElementById('userMenu').style.display = 'block';
     document.getElementById('accountManagementPage').style.display = 'none';
     document.getElementById('backToAppButton').style.display = 'none';
-    document.getElementById('themeCustomizer').style.display = 'flex';
+    document.getElementById('themeCustomizer').style.display = 'block';
     
     updateUserUI();
     updateSummary();
@@ -1313,6 +1334,29 @@ function setupEventListeners() {
         });
     }
     
+    // 17. PWA Install button
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installButton = document.getElementById('installButton');
+        if (installButton) {
+            installButton.style.display = 'flex';
+            installButton.addEventListener('click', () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted install');
+                        }
+                        deferredPrompt = null;
+                        installButton.style.display = 'none';
+                    });
+                }
+            });
+        }
+    });
+    
     console.log('✅ All event listeners setup complete');
 }
 
@@ -1417,157 +1461,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+                console.log('Service Worker registered:', registration);
+            })
+            .catch(error => {
+                console.log('Service Worker registration failed:', error);
+            });
+    });
+}
+
 // Handle global errors
 window.addEventListener('error', function(e) {
     console.error('Global error:', e.error);
     showNotification('Có lỗi xảy ra: ' + (e.error?.message || 'Unknown'), 'error');
-});
-// ====================
-// AUTHENTICATION FUNCTIONS
-// ====================
-
-// Hàm xử lý đăng nhập
-async function handleLogin(email, password) {
-  console.log('🔐 Attempting login with:', email);
-  
-  try {
-    // Hiển thị loading
-    showNotification('Đang đăng nhập...', 'info');
-    
-    // Đăng nhập với Firebase Auth
-    const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
-    const user = userCredential.user;
-    
-    console.log('✅ Login successful:', user.email);
-    showNotification('Đăng nhập thành công!', 'success');
-    
-    // Lưu thông tin user
-    localStorage.setItem('userEmail', user.email);
-    localStorage.setItem('userName', user.displayName || user.email.split('@')[0]);
-    localStorage.setItem('userId', user.uid);
-    
-    // Chuyển đến main app
-    setTimeout(() => {
-      showMainApp();
-    }, 1000);
-    
-  } catch (error) {
-    console.error('❌ Login error:', error.code, error.message);
-    
-    // Hiển thị lỗi cụ thể
-    let errorMessage = 'Đăng nhập thất bại! ';
-    switch (error.code) {
-      case 'auth/user-not-found':
-        errorMessage += 'Email không tồn tại.';
-        break;
-      case 'auth/wrong-password':
-        errorMessage += 'Mật khẩu sai.';
-        break;
-      case 'auth/invalid-email':
-        errorMessage += 'Email không hợp lệ.';
-        break;
-      case 'auth/too-many-requests':
-        errorMessage += 'Quá nhiều lần thử. Vui lòng thử lại sau.';
-        break;
-      default:
-        errorMessage += error.message;
-    }
-    
-    showNotification(errorMessage, 'error');
-    document.getElementById('loginMessage').textContent = errorMessage;
-  }
-}
-
-// Hàm hiển thị main app
-function showMainApp() {
-  console.log('🔄 Switching to main app...');
-  
-  // Ẩn auth container
-  document.getElementById('authContainer').style.display = 'none';
-  
-  // Hiển thị main app
-  document.getElementById('mainApp').style.display = 'block';
-  
-  // Hiển thị user menu
-  document.getElementById('userMenu').style.display = 'block';
-  
-  // Cập nhật tên người dùng
-  const userName = localStorage.getItem('userName') || 'Người dùng';
-  document.getElementById('welcomeName').textContent = userName;
-  document.getElementById('userName').textContent = userName;
-  document.getElementById('dropdownName').textContent = userName;
-  
-  // Load dữ liệu
-  loadUserData();
-  loadExpenses();
-  loadCategories();
-  
-  console.log('✅ Main app displayed');
-}
-
-// Hàm đăng ký
-async function handleRegister(name, email, username, password) {
-  try {
-    showNotification('Đang tạo tài khoản...', 'info');
-    
-    // Tạo user trong Firebase Auth
-    const userCredential = await firebaseAuth.createUserWithEmailAndPassword(email, password);
-    const user = userCredential.user;
-    
-    // Cập nhật display name
-    await user.updateProfile({
-      displayName: name
-    });
-    
-    // Lưu thêm thông tin vào Firestore
-    await firebaseFirestore.collection('users').doc(user.uid).set({
-      name: name,
-      email: email,
-      username: username,
-      createdAt: new Date(),
-      limit: 0,
-      categories: [
-        { id: 'food', name: 'Ăn uống', icon: 'fa-utensils' },
-        { id: 'transport', name: 'Đi lại', icon: 'fa-car' },
-        { id: 'shopping', name: 'Mua sắm', icon: 'fa-shopping-bag' },
-        { id: 'entertainment', name: 'Giải trí', icon: 'fa-film' },
-        { id: 'bill', name: 'Hóa đơn', icon: 'fa-file-invoice' },
-        { id: 'other', name: 'Khác', icon: 'fa-tag' }
-      ]
-    });
-    
-    showNotification('Đăng ký thành công!', 'success');
-    
-    // Chuyển về form đăng nhập
-    document.getElementById('registerForm').style.display = 'none';
-    document.getElementById('loginForm').style.display = 'block';
-    
-    // Điền email vào form login
-    document.getElementById('loginEmail').value = email;
-    
-  } catch (error) {
-    console.error('❌ Register error:', error);
-    showNotification('Lỗi đăng ký: ' + error.message, 'error');
-  }
-}
-
-// Kiểm tra đăng nhập khi trang load
-function checkAuthState() {
-  firebaseAuth.onAuthStateChanged((user) => {
-    if (user) {
-      console.log('👤 User already logged in:', user.email);
-      showMainApp();
-    } else {
-      console.log('👤 No user logged in');
-      // Hiển thị auth container
-      document.getElementById('authContainer').style.display = 'block';
-      document.getElementById('mainApp').style.display = 'none';
-    }
-  });
-}
-
-// Gọi hàm kiểm tra khi trang load
-window.addEventListener('load', () => {
-  console.log('📱 App loaded, checking auth state...');
-  checkAuthState();
 });

@@ -27,6 +27,31 @@
     
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeGxLnXAHpP6z0RWeMWfEiZZWC80MAq7k",
+            authDomain: "quantritien.firebaseapp.com",
+            projectId: "quantritien",
+            storageBucket: "quantritien.firebasestorage.app",
+            messagingSenderId: "800532637452",
+            appId: "1:800532637452:web:d31ea39cdca4efe56fcb29"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Make available globally
+        window.firebaseAuth = firebase.auth();
+        window.firebaseFirestore = firebase.firestore();
+        window.firebaseStorage = firebase.storage();
+    </script>
 </head>
 <body>
     <!-- Offline Indicator -->
@@ -40,7 +65,7 @@
     </button>
     
     <!-- Theme Customizer -->
-    <div class="theme-customizer" id="themeCustomizer">
+    <div class="theme-customizer" id="themeCustomizer" style="display: none;">
         <button class="theme-button" id="themeButton">
             <i class="fas fa-palette"></i>
             <span>Tuỳ chỉnh giao diện</span>
@@ -203,47 +228,6 @@
                         Đã có tài khoản? <a href="#" id="showLogin">Đăng nhập</a>
                     </div>
                 </div>
-                
-                <!-- Change Password Form -->
-                <div id="changePasswordForm" style="display: none;">
-                    <h2><i class="fas fa-key"></i> Đổi mật khẩu</h2>
-                    <form class="auth-form" id="changePasswordFormElement">
-                        <div class="form-group">
-                            <label for="currentPassword">Mật khẩu hiện tại</label>
-                            <div class="password-input">
-                                <input type="password" id="currentPassword" placeholder="Nhập mật khẩu hiện tại" required>
-                                <button type="button" class="toggle-password" data-target="currentPassword">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="newPassword">Mật khẩu mới</label>
-                            <div class="password-input">
-                                <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)" required minlength="6">
-                                <button type="button" class="toggle-password" data-target="newPassword">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="confirmNewPassword">Xác nhận mật khẩu mới</label>
-                            <div class="password-input">
-                                <input type="password" id="confirmNewPassword" placeholder="Nhập lại mật khẩu mới" required minlength="6">
-                                <button type="button" class="toggle-password" data-target="confirmNewPassword">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="auth-message" id="changePasswordMessage"></div>
-                        <button type="submit" class="auth-button">
-                            <i class="fas fa-save"></i> Cập nhật mật khẩu
-                        </button>
-                    </form>
-                    <div class="auth-links">
-                        <a href="#" id="backToAppFromChangePassword">Quay lại ứng dụng</a>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -365,7 +349,7 @@
     </div>
     
     <!-- Main App Container -->
-    <div class="container main-app" id="mainApp">
+    <div class="container main-app" id="mainApp" style="display: none;">
         <header>
             <h1><i class="fas fa-wallet"></i> QUẢN LÝ CHI TIÊU <span class="pwa-badge">EAP</span></h1>
             <p class="app-description">Xin chào, <span id="welcomeName">Người dùng</span>!</p>
@@ -506,35 +490,8 @@
     <!-- Notification -->
     <div class="notification" id="notification"></div>
     
-  
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-
-<script>
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDeGxLnXAHpP6z0RWeMWfEiZZWC80MAq7k",
-    authDomain: "quantritien.firebaseapp.com",
-    projectId: "quantritien",
-    storageBucket: "quantritien.firebasestorage.app",
-    messagingSenderId: "800532637452",
-    appId: "1:800532637452:web:d31ea39cdca4efe56fcb29"
-  };
-  
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  
-  // Make available globally
-  window.firebaseAuth = firebase.auth();
-  window.firebaseFirestore = firebase.firestore();
-  window.firebaseStorage = firebase.storage();
-</script>
-
+    <!-- Load app scripts -->
+    <script src="firebase-service.js"></script>
+    <script src="app-fixed.js"></script>
 </body>
-
 </html>
-
-

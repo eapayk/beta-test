@@ -1477,3 +1477,82 @@ footer {
 .pb-10 { padding-bottom: 10px; }
 .pl-10 { padding-left: 10px; }
 .pr-10 { padding-right: 10px; }
+/* ========== FIXES FOR DISPLAY ISSUES ========== */
+.user-menu, .theme-customizer {
+    display: block;
+}
+
+#authContainer, #mainApp, #accountManagementPage {
+    display: none;
+}
+
+#authContainer {
+    display: block;
+}
+
+.user-dropdown, .theme-panel {
+    position: absolute;
+    z-index: 1000;
+}
+
+/* Fix for tab content visibility */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Fix for offline indicator */
+.offline-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--danger-color);
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-weight: bold;
+    z-index: 1001;
+    display: none;
+}
+
+.offline-indicator.show {
+    display: block;
+}
+
+/* Fix for install button */
+.install-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, var(--secondary-color), #27ae60);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 24px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    cursor: pointer;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.install-button.show {
+    display: flex;
+}
+
+/* Fix for back to app button */
+.back-to-app {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    display: none;
+}
