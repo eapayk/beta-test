@@ -1464,18 +1464,38 @@ document.addEventListener('DOMContentLoaded', function() {
 // Register Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
+        // Sử dụng đường dẫn tương đối
+        navigator.serviceWorker.register('service-worker.js')
             .then(registration => {
-                console.log('Service Worker registered:', registration);
+                console.log('✅ Service Worker registered:', registration.scope);
+                
+                // Kiểm tra PWA installability
+                checkPWAInstallability();
             })
             .catch(error => {
-                console.log('Service Worker registration failed:', error);
+                console.log('❌ Service Worker registration failed:', error);
+                showNotification('Không thể đăng ký Service Worker', 'error');
             });
     });
+}
+
+function checkPWAInstallability() {
+    // Hiển thị trạng thái PWA
+    const pwaStatus = document.getElementById('pwaStatus');
+    if (pwaStatus) {
+        pwaStatus.innerHTML = `
+            <i class="fas fa-check-circle"></i> 
+            Ứng dụng có thể cài đặt như PWA
+            <br><small>Mở trình đơn trình duyệt để cài đặt</small>
+        `;
+        pwaStatus.style.backgroundColor = 'rgba(46, 204, 113, 0.2)';
+        pwaStatus.style.borderLeftColor = 'var(--secondary-color)';
+    }
 }
 
 // Handle global errors
 window.addEventListener('error', function(e) {
     console.error('Global error:', e.error);
     showNotification('Có lỗi xảy ra: ' + (e.error?.message || 'Unknown'), 'error');
+
 });
